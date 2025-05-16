@@ -1,28 +1,56 @@
-import React from "react";
+import { useState, useEffect } from "react";
+import "/workspaces/AMS-ChangeLights/src/styles/index.css";
 
-//include images into your bundle
-import rigoImage from "../../img/rigo-baby.jpg";
+function App() {
+  const [color, setColor] = useState("red");
+  const [colors, setColors] = useState(["red", "yellow", "green"]);
+  const [auto, setAuto] = useState(false);
 
-//create your first component
-const Home = () => {
-	return (
-		<div className="text-center">
-            
+  useEffect(() => {
+    if (!auto) return;
 
-			<h1 className="text-center mt-5">Hello Rigo!</h1>
-			<p>
-				<img src={rigoImage} />
-			</p>
-			<a href="#" className="btn btn-success">
-				If you see this green button... bootstrap is working...
-			</a>
-			<p>
-				Made by{" "}
-				<a href="http://www.4geeksacademy.com">4Geeks Academy</a>, with
-				love!
-			</p>
-		</div>
-	);
-};
+    const interval = setInterval(() => {
+      setColor((prev) => {
+        const currentIndex = colors.indexOf(prev);
+        return colors[(currentIndex + 1) % colors.length];
+      });
+    }, 3000);
 
-export default Home;
+    return () => clearInterval(interval);
+  }, [auto, colors]);
+
+  const togglePurple = () => {
+    if (colors.includes("purple")) {
+      setColors(colors.filter((col) => col !== "purple"));
+      if (color === "purple") setColor("red");
+    } else {
+      setColors([...colors, "purple"]);
+    }
+  };
+
+  return (
+    <div className="traffic-container">
+      <div className="traffic-light">
+        <div className="traffic-top"></div>
+        {colors.map((col) => (
+          <div
+            key={col}
+            className={`light ${col} ${color === col ? "glow" : ""}`}
+            onClick={() => setColor(col)}
+          ></div>
+        ))}
+      </div>
+      <div className="pole"></div>
+      <div>
+        <button onClick={() => setAuto(!auto)}>
+          {auto ? "Detener Cambio Automático" : "Iniciar Cambio Automático"}
+        </button>
+        <button onClick={togglePurple}>
+          {colors.includes("purple") ? "Quitar Púrpura" : "Agregar Púrpura"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export default App;
